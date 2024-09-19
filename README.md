@@ -68,8 +68,8 @@ langgraph-pdf-chat/
 ├── requirements.txt          # Project dependencies
 ├── .env                      # Environment variables (create from .env.example)
 ├── .env.example              # Example environment variable file
-├── notebooks/                # Directory for unit tests (optional)
-│   ├── pdf-chat.ipynb        # Jupyter notebook for testing the chatbot (optional)
+├── notebooks/                # Jupyter notebooks for testing and development
+│   ├── pdf-chat.ipynb        # Jupyter notebook for step-by-step execution
 │   └── ...
 ├── docs/                     # Folder for storing PDF documents (or other supported formats)
 │   ├── doc1.pdf
