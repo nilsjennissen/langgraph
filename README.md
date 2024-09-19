@@ -14,40 +14,49 @@ Key features:
 
 ## 🚧 Prerequisites
 
-- Python 3.8+
+- Python 3.10+
 - API keys for chosen LLM providers (e.g., OpenAI, Anthropic)
 - (Optional) Ollama for local LLM support
 
 ## 🎛 Project Setup
 
 1. Clone the repository:
-git clone https://github.com/yourusername/advanced-rag-chatbot.git
-cd advanced-rag-chatbot
-Copy
+```bash
+git clone https://github.com/nilsjennissen/langgraph-rag-chatbot.git
+cd langgraph-rag-chatbot
+```
 2. Create and activate a virtual environment:
+```bash
 python -m venv venv
 source venv/bin/activate  # On Windows, use venv\Scripts\activate
-Copy
+```
 3. Install dependencies:
+```bash
 pip install -r requirements.txt
-Copy
+```
 4. Set up environment variables:
+```bash
 cp .env.example .env
+
 CopyEdit `.env` and add your API keys:
 OPENAI_API_KEY=your_openai_api_key
 ANTHROPIC_API_KEY=your_anthropic_api_key
 Add other API keys as needed
-Copy
+```
 5. Prepare your document corpus:
 - Place PDF documents in the `./docs` folder
-- Alternatively, modify the `load_documents()` function in `main.py` to support other document types or sources
+- Alternatively, modify the `load_documents()` function in `app.py` to support other document types or sources
 
 6. Customize the system prompt:
-- Edit the `SYSTEM_PROMPT` constant in `main.py` to align with your specific use case or domain
+- Edit the `SYSTEM_PROMPT` constant in `app.py` to align with your specific use case or domain
 
 7. Run the chatbot:
-python main.py
-Copy
+```bash
+python app.py
+```
+```bash
+streamlit run app.py
+```
 ## 📦 Project Structure
 ```bash
 langgraph-pdf-chat/
@@ -75,7 +84,7 @@ langgraph-pdf-chat/
 
 ## 🔀 Reproducing the Graph
 
-The chatbot's logic is implemented using LangChain's StateGraph. Here's how to reproduce and customize the graph:
+The chatbot's logic is implemented using LangGraphs GraphState. Here's how to reproduce and customize the graph.
 
 1. Define the graph state:
    ```python
@@ -85,20 +94,19 @@ The chatbot's logic is implemented using LangChain's StateGraph. Here's how to r
        documents: List[str]
        retries: int
 
-    Implement node functions:
+    # Implement node functions
+    # retrieve: Fetch relevant documents
+    # generate: Produce an answer using retrieved documents
+    # grade_documents: Evaluate document relevance
+    # transform_query: Rewrite the query for better retrieval
+    # normal_llm: Direct LLM call without retrieval
+    # route_question: Decide between vectorstore and normal LLM
+    # decide_to_generate: Choose between generation and query transformation
+    # grade_generation: Evaluate the generated answer
 
-    retrieve: Fetch relevant documents
-    generate: Produce an answer using retrieved documents
-    grade_documents: Evaluate document relevance
-    transform_query: Rewrite the query for better retrieval
-    normal_llm: Direct LLM call without retrieval
-    route_question: Decide between vectorstore and normal LLM
-    decide_to_generate: Choose between generation and query transformation
-    grade_generation: Evaluate the generated answer
 
-
-    Create and compile the graph:
-    pythonCopyworkflow = StateGraph(GraphState)
+    # Create and compile the graph
+    workflow = StateGraph(GraphState)
 
     # Add nodes
     workflow.add_node("normal_llm", normal_llm)
@@ -116,9 +124,13 @@ The chatbot's logic is implemented using LangChain's StateGraph. Here's how to r
     # Compile the graph
     app = workflow.compile()
 
-    Run the graph:
-    pythonCopyinputs = {"question": user_question}
+    # Run the graph:
+    inputs = {"question": user_input}
+   
     for output in app.stream(inputs):
+       for key, value in output.items():
+           if "generation" in value:
+               result = value["generation"]
     # Process output```
 
 
@@ -131,17 +143,6 @@ Update the LLM initialization in main.py:
 # For OpenAI
 from langchain_openai import ChatOpenAI
 llm = ChatOpenAI(model_name="gpt-3.5-turbo")
-
-# For Anthropic
-from langchain_anthropic import ChatAnthropic
-llm = ChatAnthropic(
-    model="claude-3-5-sonnet-20240620",
-    temperature=0,
-    max_tokens=1024,
-    timeout=None,
-    max_retries=2,
-    # other params...
-)
 
 # For Ollama (local)
 from langchain_community.chat_models import ChatOllama
@@ -194,21 +195,24 @@ Update the requirements.txt file if necessary to include the appropriate LangCha
 
 # 🗄️ Data
 The chatbot processes documents stored in the ./docs/ folder to build its knowledge base. By default, it supports PDF files, but you can extend load_documents() in main.py to handle additional formats or data sources.
+
 # 🛠 Customization
 
-System Prompt: Modify the SYSTEM_PROMPT in main.py to tailor the chatbot's behavior and domain expertise.
-LLM Provider: Change the LLM initialization as described in the "LLM Provider Configuration" section.
-Document Loading: Extend the load_documents() function to support additional file types or data sources.
-Retrieval Strategy: Adjust the weights in the EnsembleRetriever to fine-tune the balance between keyword and semantic search.
-Evaluation Criteria: Modify the grading prompts to implement custom evaluation logic for document relevance and answer quality.
+System Prompt: Modify the SYSTEM_PROMPT in main.py to tailor the chatbot's behavior and domain expertise.  
+LLM Provider: Change the LLM initialization as described in the "LLM Provider Configuration" section.  
+Document Loading: Extend the load_documents() function to support additional file types or data sources.  
+Retrieval Strategy: Adjust the weights in the EnsembleRetriever to fine-tune the balance between keyword and semantic search.  
+Evaluation Criteria: Modify the grading prompts to implement custom evaluation logic for document relevance and answer quality.  
 
 # 📚 References
 
-LangChain Documentation
-LangGraph Documentation
-OpenAI API Documentation
-Anthropic API Documentation
-Ollama GitHub Repository
+[Ollama](https://ollama.com/)
+[OpenAI API Documentation](https://platform.openai.com/docs/overview)  
+[LangChain Documentation](https://python.langchain.com/v0.2/docs/introduction/)  
+[LangGraph Documentation](https://langchain-ai.github.io/langgraph/)
+
+
+
 
 # 🏆 Conclusion
 This Advanced RAG Chatbot showcases the power of combining retrieval-augmented generation with flexible LLM integration. Its modular design and customization options make it adaptable to various domains and LLM providers, providing a solid foundation for building sophisticated question-answering systems.

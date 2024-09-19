@@ -22,6 +22,8 @@ from langchain_community.vectorstores import SKLearnVectorStore
 from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langgraph.graph import END, START, StateGraph
+from pydantic import BaseModel, Field, validator, PositiveInt, ValidationError
+
 
 llm_model = "gpt4o"
 
